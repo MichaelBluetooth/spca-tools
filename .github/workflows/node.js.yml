@@ -6,8 +6,8 @@ name: Node.js CI
 on:
   push:
     branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+  # pull_request:
+  #   branches: [ "main" ]
 
 jobs:
   build:
@@ -26,12 +26,14 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-    - run: npm install
-    - run: npm run build
-    - run: npm test
+    - run: |
+        npm install
+        npm run build
+        npm test
     - name: Archive build artifacts
       uses: actions/upload-artifact@v4
       with:
         name: dist
-        path: dist
+        path: |
+          dist
         
