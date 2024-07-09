@@ -1,0 +1,32 @@
+{
+  "name": "spca_tools",
+  "version": "1.0.0",
+  "description": "scripts to analyze spca data",
+  "main": "main.js",
+  "scripts": {
+    "build": "tsc",
+    "test": "npm run build && jasmine"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/jasmine": "^5.1.4",
+    "@types/node": "^20.14.9",
+    "browserify": "^17.0.0",
+    "jasmine": "^5.1.0",
+    "jasmine-core": "^5.1.2",
+    "karma": "^6.4.3",
+    "karma-browserify": "^8.1.0",
+    "karma-chrome-launcher": "^3.2.0",
+    "karma-jasmine": "^5.1.0",
+    "karma-jasmine-html-reporter": "^2.1.0",
+    "karma-spec-reporter": "^0.0.36",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.5.3",
+    "watchify": "^4.0.0"
+  },
+  "dependencies": {
+    "csv-parser": "^3.0.0",
+    "fs": "^0.0.1-security"
+  }
+}
