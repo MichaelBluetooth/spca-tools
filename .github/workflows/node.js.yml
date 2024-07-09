@@ -36,4 +36,5 @@ jobs:
         name: dist
         path: |
           dist
+          node_modules
         
