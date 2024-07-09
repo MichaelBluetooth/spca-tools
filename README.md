@@ -14,7 +14,7 @@ npm run build
 # Run the program
 
 ```
-node .\dist\main.js ./data/MyAnimalIntakeExtendedReport.csv
+node .\dist\main.js .\data\MyAnimalIntakeExtendedReport.csv
 ```
 
 Will output something like:
