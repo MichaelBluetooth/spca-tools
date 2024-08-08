@@ -1,6 +1,9 @@
 import { AnimalIntakeExtended } from "../models/animal-intake-extended";
+import { extractAddress, extractStreetNumber, getAddress } from "./address-utils";
+import { Logger } from "./logger";
+import { Jurisdictions, readJurisdictions } from "./read-jurisdictions";
 
-export function validateAnimalIntakeExtended(intake: AnimalIntakeExtended): string[] {
+export function validateAnimalIntakeExtended(intake: AnimalIntakeExtended, jurisdictions: Jurisdictions): string[] {
     const errors: string[] = [];
 
     const validators = [
@@ -9,7 +12,8 @@ export function validateAnimalIntakeExtended(intake: AnimalIntakeExtended): stri
         validateGender,
         validateSpyNeuterStatus,
         validateAge,
-        validateSex
+        validateSex,
+        validateJurisdiction(jurisdictions)
     ];
 
     validators.forEach(validate => {
@@ -34,8 +38,8 @@ export function validateAge(intake: AnimalIntakeExtended): string {
 
 //Sex cannot be 'unknown' if it's a cat or dog
 export function validateSex(intake: AnimalIntakeExtended): string {
-    const isCatOrDog = intake.species.toLowerCase() === 'cat' || intake.species.toLowerCase() === 'dog';
-    if (isCatOrDog && (!intake.gender || intake.gender.toLowerCase() === 'unknown')) {
+    const isCatOrDog = intake.species?.toLowerCase() === 'cat' || intake.species?.toLowerCase() === 'dog';
+    if (isCatOrDog && (!intake.gender || intake.gender?.toLowerCase() === 'unknown')) {
         return `Sex cannot be '${intake.gender}' when the species is cat or dog`
     } else {
         return null;
@@ -66,7 +70,7 @@ export function validateRequiredFields(intake: AnimalIntakeExtended): string {
 
 //The "location found" field must be set if the type is "Stray"
 export function validateLocationFound(intake: AnimalIntakeExtended): string {
-    if (intake.operationType.toLowerCase() === 'stray') {
+    if (intake.operationType?.toLowerCase() === 'stray') {
         return intake.locationFound === null ? `The 'Location Found' field must have a value when the intake type is 'Stray'` : null
     } else {
         return null;
@@ -75,7 +79,7 @@ export function validateLocationFound(intake: AnimalIntakeExtended): string {
 
 //Spay/Neuter status must be set of the intake type is "Stray"
 export function validateSpyNeuterStatus(intake: AnimalIntakeExtended): string {
-    const isStray = intake.operationType.toLowerCase() === 'stray';
+    const isStray = intake.operationType?.toLowerCase() === 'stray';
     if (isStray && intake.spayNeutered !== 'Y' && intake.spayNeutered !== 'N') {
         return `Intakes of type 'Stray' must have the spy/neuter status set (value was '${intake.spayNeutered}')`;
     } else {
@@ -85,7 +89,7 @@ export function validateSpyNeuterStatus(intake: AnimalIntakeExtended): string {
 
 //Animal gender must be set to "M" or "F" if it's a cat or dog
 export function validateGender(intake: AnimalIntakeExtended): string {
-    const isCatOrDog = intake.species.toLowerCase() === 'cat' || intake.species.toLowerCase() === 'dog';
+    const isCatOrDog = intake.species?.toLowerCase() === 'cat' || intake.species?.toLowerCase() === 'dog';
     if (isCatOrDog) {
         return (intake.gender === 'M' || intake.gender === 'F') ? null : `Gender must be set to "M" or "F" if the species is ${intake.species}`;
     } else {
@@ -103,9 +107,9 @@ export function validateAnimalName(intake: AnimalIntakeExtended): string {
     } else {
         //Intentionally examining case sensitive names (for now unless someone tells me otherwise)
         let expectedNameEnding = '-m';
-        if (intake.species.toLowerCase() === 'dog') {
+        if (intake.species?.toLowerCase() === 'dog') {
             expectedNameEnding = '-d'
-        } else if (intake.species.toLowerCase() === 'cat') {
+        } else if (intake.species?.toLowerCase() === 'cat') {
             expectedNameEnding = '-c'
         }
 
@@ -116,3 +120,42 @@ export function validateAnimalName(intake: AnimalIntakeExtended): string {
 
     return null;
 }
+
+export const validateJurisdiction = ((jurisdictions: Jurisdictions) => (intake: AnimalIntakeExtended) => {
+    const fixedJurisdiction = intake.jurisdiction
+        ?.replace(', Town of', '')
+        ?.toLowerCase();
+
+    if (intake.operationType?.toLowerCase() === 'stray') {
+        if (!jurisdictions[fixedJurisdiction]) {
+            return `No jurisdiction matches: ${intake.jurisdiction}`;
+        } else {
+            const locationFound = getAddress(intake.locationFound);
+            const isMatch = jurisdictions[fixedJurisdiction].some(street => {
+                return street.isMatch(locationFound.streetNumber, locationFound.streetName, locationFound.suffix, locationFound.prefix);
+            });
+            
+            if (isMatch) {
+                return null;
+            } else {
+                let expected = null;
+                Logger.LogDebug(`Intake jurisdiction incorrect, looking for expected match (${fixedJurisdiction})`);
+                Object.keys(jurisdictions).forEach(jurisdiction => {                    
+                    Logger.LogDebug(`Checking ${jurisdiction}`);
+                    const isMatch = jurisdictions[jurisdiction].some(street => {
+                        return street.isMatch(locationFound.streetNumber, locationFound.streetName, locationFound.suffix, locationFound.prefix);
+                    });
+                    if(isMatch){
+                        expected = jurisdiction;
+                    }
+                });
+
+                return `Location found (${intake.locationFound}) did not match jurisdiction. Expected="${expected ? expected : '[none found]'}", Actual="${fixedJurisdiction}"`;
+            }
+        }
+    } else {
+        return null;
+    }
+});
+
+

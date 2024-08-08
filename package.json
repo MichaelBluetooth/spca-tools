@@ -26,7 +26,11 @@
     "watchify": "^4.0.0"
   },
   "dependencies": {
+    "addresser": "^1.1.20",
+    "addressit": "^1.8.2",
     "csv-parser": "^3.0.0",
-    "fs": "^0.0.1-security"
+    "fs": "^0.0.1-security",
+    "node-xlsx": "^0.24.0",
+    "parse-address": "^1.1.2"
   }
 }
