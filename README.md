@@ -14,7 +14,8 @@ npm run build
 # Run the program
 
 ```
-node .\dist\main.js .\data\MyAnimalIntakeExtendedReport.csv
+node .\dist\main.js .\data\MyAnimalIntakeExtendedReport.csv .\data\Jurisdictions.xlsx
+node .\dist\main.js .\data\MyAnimalIntakeExtendedReport.csv .\data\Jurisdictions.xlsx 35250,35252,32623
 ```
 
 Will output something like:
