@@ -19,7 +19,9 @@ if (enableDebug) {
     Logger.enableDebug();
 }
 
-Logger.LogInfo(`Limiting validation to ARNs: ` + JSON.stringify(limitToARN));
+if(limitToARN && limitToARN.length > 0){
+    Logger.LogInfo(`Limiting validation to ARNs: ` + JSON.stringify(limitToARN));
+}
 
 createReadStream(filePath)
     .pipe(csv())
