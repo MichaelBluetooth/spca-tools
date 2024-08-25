@@ -4,6 +4,16 @@ import { Street } from "./jurisdictions";
 
 export type Jurisdictions = { [key: string]: Street[]; };
 
+function mapJurisdictions(jurisdiction: string): string {
+    if(jurisdiction.toLowerCase() === 'TRUMANSBURG VILLAGE'.toLowerCase()){
+        return 'ULYSSES'.toLowerCase();
+    } else if (jurisdiction.toLowerCase() === 'cayuga heights'){
+        return 'ithaca';
+    } else {
+        return jurisdiction.toLowerCase();
+    }
+}
+
 export function readJurisdictions(fileNameAndPath: string): Jurisdictions {
     if (!existsSync(fileNameAndPath)) {
         throw `Jurisdictions file note found: "${fileNameAndPath}"`;
@@ -16,7 +26,7 @@ export function readJurisdictions(fileNameAndPath: string): Jurisdictions {
     const jurisdictions = {};
     sheet.data.forEach((row) => {
         if (row[0] !== 'Pre') {
-            const jurisdiction = row[7]?.trim()?.toLowerCase();
+            let jurisdiction = row[7]?.trim();
             const street: Street = new Street(
                 +row[3], //low
                 +row[4], //high
@@ -27,6 +37,7 @@ export function readJurisdictions(fileNameAndPath: string): Jurisdictions {
             );
 
             if (jurisdiction) {
+                jurisdiction = mapJurisdictions(jurisdiction);
                 if(!jurisdictions[jurisdiction]){
                     jurisdictions[jurisdiction] = [];
                 }                

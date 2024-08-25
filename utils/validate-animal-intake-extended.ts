@@ -124,6 +124,7 @@ export function validateAnimalName(intake: AnimalIntakeExtended): string {
 export const validateJurisdiction = ((jurisdictions: Jurisdictions) => (intake: AnimalIntakeExtended) => {
     const fixedJurisdiction = intake.jurisdiction
         ?.replace(', Town of', '')
+        ?.replace('City of Ithaca', 'ITHACA CITY')
         ?.toLowerCase();
 
     if (intake.operationType?.toLowerCase() === 'stray') {

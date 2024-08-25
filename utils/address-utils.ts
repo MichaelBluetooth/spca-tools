@@ -87,5 +87,6 @@ export function extractStreetSuffix(part: string): string {
         .replace('road', 'rd')
         .replace('drive', 'dr')
         .replace('place', 'pl')
-        .replace('heights', 'hts');
+        .replace('heights', 'hts')
+        .replace('parkway', 'pkwy');
 }

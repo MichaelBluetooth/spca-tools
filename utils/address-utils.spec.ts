@@ -64,6 +64,15 @@ describe('address utils', () => {
                 suffix: 'rd',
                 prefix: 's'
             }
+        },
+        {
+            raw: '500 S Meadow Street Wegmans',
+            expected: {
+                streetNumber: 500,
+                streetName: 'Meadow',
+                suffix: 'st',
+                prefix: 's'
+            }
         }
     ].forEach(testCase => {
         it(`Gets the address parts for "${testCase.raw}"`, () => {
